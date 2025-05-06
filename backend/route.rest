@@ -1,0 +1,69 @@
+# Variables (Adjust if your server runs on a different port)
+@baseUrl = http://localhost:3001/api/v1/notes
+
+###
+# GET all notes
+# Retrieves the list of all current notes.
+GET {{baseUrl}}/
+
+###
+# POST - Create a new note
+# Creates a new note. Requires 'title' and 'body' in the JSON payload.
+# NOTE: Your API code expects 'body', but your example data uses 'content'.
+#       This request uses 'body' as required by the API code.
+POST {{baseUrl}}/
+Content-Type: application/json
+
+{
+  "title": "New Note via REST",
+  "body": "This is the content (body) of the new note."
+}
+
+###
+# POST - Create a note with missing info (should fail)
+# Attempts to create a note without a 'body'. Expecting a 400 error.
+POST {{baseUrl}}/
+Content-Type: application/json
+
+{
+  "title": "Incomplete Note"
+}
+
+
+###
+# PUT - Update an existing note
+# Updates the note with the specified ID. Requires 'title' and 'body'.
+# Replace '1' with a valid ID from your notes data.
+# NOTE: Uses 'body' as required by the API code.
+PUT {{baseUrl}}/1
+Content-Type: application/json
+
+{
+  "title": "Updated Note Title (ID 1)",
+  "body": "The content for note 1 has been updated."
+}
+
+###
+# PUT - Update a non-existent note (should fail)
+# Attempts to update a note with an ID that likely doesn't exist. Expecting a 404 error.
+PUT {{baseUrl}}/9999
+Content-Type: application/json
+
+{
+  "title": "Trying to update non-existent note",
+  "body": "This should not work."
+}
+
+
+###
+# DELETE - Delete an existing note
+# Deletes the note with the specified ID.
+# Replace '2' with a valid ID from your notes data that you want to delete.
+DELETE {{baseUrl}}/2
+
+
+###
+# DELETE - Delete a non-existent note (should fail)
+# Attempts to delete a note with an ID that likely doesn't exist. Expecting a 404 error.
+DELETE {{baseUrl}}/9998
+
