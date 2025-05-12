@@ -8,6 +8,7 @@ const {
   getAllNotes,
 } = require("../controllers/notes.controllers");
 const authUser = require("../middlewares/auth");
+const Note = require("../models/Note");
 
 noteRoute.get("/", authUser, getAllNotes);
 
