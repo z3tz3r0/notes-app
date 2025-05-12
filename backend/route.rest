@@ -67,3 +67,5 @@ DELETE {{baseUrl}}/2
 # Attempts to delete a note with an ID that likely doesn't exist. Expecting a 404 error.
 DELETE {{baseUrl}}/9998
 
+###
+DELETE {{baseUrl}}
