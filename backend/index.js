@@ -3,11 +3,11 @@ const dotenv = require("dotenv");
 const errorHandler = require("./utils/errMessage");
 const limiter = require("./middlewares/ratelimiter");
 const path = require("path");
-const { fileURLToPath } = require("url");
 const connectMongoDB = require("./config/mongo");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const router = require("./routes/index.routes");
+const cors = require("cors");
 
 const app = express();
 dotenv.config();
@@ -42,8 +42,6 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Pulling welcome page from public folder
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, "public")));
 
 // Route Middleware
