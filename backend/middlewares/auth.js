@@ -1,4 +1,4 @@
-const { errMessage } = require("../utils/errMessage");
+const errMessage = require("../utils/errMessage");
 const jwt = require("jsonwebtoken");
 
 const authUser = async (req, res, next) => {
