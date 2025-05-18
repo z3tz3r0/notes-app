@@ -1,11 +1,13 @@
 import { createBrowserRouter, RouterProvider } from "react-router";
 import { ThemeProvider } from "./components/theme-provider";
+import MainLayout from "./containers/MainLayout";
+import NotesApp from "./pages/NoteEditor";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <h1>App Layout</h1>,
-    children: [{ index: true, element: <h1>Landing</h1> }],
+    element: <MainLayout />,
+    children: [{ index: true, element: <NotesApp /> }],
   },
 ]);
 
