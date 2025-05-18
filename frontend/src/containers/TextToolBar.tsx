@@ -19,21 +19,26 @@ import {
   Table,
   Underline,
 } from "lucide-react";
+import React from "react";
 
-const buttons: IconButtonProps[] = [
-  { Icon: Bold },
-  { Icon: Italic },
-  { Icon: Underline },
-  { Icon: Strikethrough },
-  { Icon: AlignLeft },
-  { Icon: List },
-  { Icon: ListOrdered },
-  { Icon: Link2 },
-  { Icon: ImageIcon },
-  { Icon: Table },
+interface TextToolBarProps {
+  onFormatAction: (command: string) => void;
+}
+
+const buttons: (IconButtonProps & { command?: string })[] = [
+  { Icon: Bold, command: "bold" },
+  { Icon: Italic, command: "italic" },
+  { Icon: Underline, command: "underline" },
+  { Icon: Strikethrough, command: "strikeThrough" },
+  { Icon: AlignLeft, command: "justifyLeft" },
+  { Icon: List, command: "insertUnorderedList" },
+  { Icon: ListOrdered, command: "insertOrderedList" },
+  { Icon: Link2 }, // Link requires more complex handling, skip for now
+  { Icon: ImageIcon }, // Image requires more complex handling, skip for now
+  { Icon: Table }, // Table requires more complex handling, skip for now
 ];
 
-const TextToolBar = () => {
+const TextToolBar: React.FC<TextToolBarProps> = ({ onFormatAction }) => {
   return (
     <div className="flex items-center space-x-1">
       <Select defaultValue="p">
@@ -60,7 +65,11 @@ const TextToolBar = () => {
 
       {/* Text editor button group */}
       {buttons.map((item, index) => (
-        <IconButton key={index} Icon={item.Icon} />
+        <IconButton
+          key={index}
+          Icon={item.Icon}
+          onClick={() => item.command && onFormatAction(item.command)}
+        />
       ))}
     </div>
   );

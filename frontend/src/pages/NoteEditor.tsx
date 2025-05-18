@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import TextToolBar from "@/containers/TextToolBar";
 import { cn } from "@/lib/utils";
+import { useNoteStore } from "@/store/notesStores";
 import { List, Plus, Search, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { mockNoteDB } from "../data/mockNotes";
 import type { Note } from "../types/notes";
 
@@ -13,11 +14,96 @@ export default function NotesApp() {
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [noteListOpen, setNoteListOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const { editorContent, setEditorContent, loadNoteContent } = useNoteStore();
 
   useEffect(() => {
     setNotes(mockNoteDB);
-    setSelectedNote(notes[0]);
-  }, [notes]);
+    // Set initial selected note, maybe the first one or null if list is empty
+    if (mockNoteDB.length > 0) {
+      setSelectedNote(mockNoteDB[0]);
+    } else {
+      setSelectedNote(null);
+    }
+  }, []); // Empty dependency array to run only once on mount
+
+  const editorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (selectedNote) {
+      loadNoteContent(selectedNote.content);
+    } else {
+      loadNoteContent(""); // Clear editor if no note is selected
+    }
+  }, [selectedNote, loadNoteContent]);
+
+  useEffect(() => {
+    if (editorRef.current && editorRef.current.innerHTML !== editorContent) {
+      editorRef.current.innerHTML = editorContent;
+    }
+  }, [editorContent]);
+
+  const handleInput = () => {
+    if (editorRef.current) {
+      setEditorContent(editorRef.current.innerHTML);
+    }
+  };
+
+  const handleFormatAction = (command: string) => {
+    if (!editorRef.current) return;
+
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
+    const selectedText = range.toString();
+
+    // Check if the selection is within the contenteditable div
+    if (!editorRef.current.contains(range.commonAncestorContainer)) {
+      return;
+    }
+
+    try {
+      switch (command) {
+        case "bold":
+          if (selectedText) {
+            const strong = document.createElement("strong");
+            range.surroundContents(strong);
+          }
+          break;
+        case "italic":
+          if (selectedText) {
+            const em = document.createElement("em");
+            range.surroundContents(em);
+          }
+          break;
+        case "underline":
+          if (selectedText) {
+            const u = document.createElement("u");
+            range.surroundContents(u);
+          }
+          break;
+        case "strikeThrough":
+          if (selectedText) {
+            const span = document.createElement("span");
+            span.style.textDecoration = "line-through";
+            range.surroundContents(span);
+          }
+          break;
+        // Add other formatting cases here using Selection and Range
+        default:
+          console.warn(`Formatting command "${command}" not implemented.`);
+          break;
+      }
+    } catch (error) {
+      console.error("Error applying formatting:", error);
+      // Consider adding a more robust error handling or fallback if needed
+    }
+
+    // Manually trigger input event to update Zustand state after DOM manipulation
+    if (editorRef.current) {
+      editorRef.current.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+  };
 
   const filteredNotes = notes.filter(
     (note) =>
@@ -117,9 +203,7 @@ export default function NotesApp() {
             )}
           </div>
 
-          {/* Bold Italic and stuff here
-          doesn't feels like it has any purpose here */}
-          <TextToolBar />
+          <TextToolBar onFormatAction={handleFormatAction} />
 
           {/* Buttton group of light dark mode */}
           <div className="flex items-center space-x-1">
@@ -134,8 +218,10 @@ export default function NotesApp() {
             <div className="max-w-4xl mx-auto p-8">
               <h1 className="text-3xl font-bold mb-6">{selectedNote.title}</h1>
               <div
-                className="prose prose-sm max-w-none"
-                dangerouslySetInnerHTML={{ __html: selectedNote.content }}
+                ref={editorRef}
+                className="prose prose-sm max-w-none focus:outline-none"
+                contentEditable={true}
+                onInput={handleInput}
               />
             </div>
           </div>
