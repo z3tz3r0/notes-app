@@ -18,13 +18,12 @@ export default function NotesApp() {
 
   useEffect(() => {
     setNotes(mockNoteDB);
-    // Set initial selected note, maybe the first one or null if list is empty
     if (mockNoteDB.length > 0) {
       setSelectedNote(mockNoteDB[0]);
     } else {
       setSelectedNote(null);
     }
-  }, []); // Empty dependency array to run only once on mount
+  }, []);
 
   const editorRef = useRef<HTMLDivElement>(null);
 
